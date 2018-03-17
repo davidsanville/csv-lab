@@ -1,0 +1,10 @@
+%dont run external functions (call from main, and run main)
+
+function res = derivate(x)
+    %disp(x);
+    sz = size(x,1);
+    for(j=0, j<sz, j++) 
+        res(j) = x[j+1] - x[j] 
+    end 
+    res = sz;
+end
