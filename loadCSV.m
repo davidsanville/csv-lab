@@ -21,12 +21,14 @@ y10 = Y10(1:125);
 
 %covariance & variance tests
 %v = var(y10,snp_glance); disp(v);
-disp(var(snp_glance, btc_glance));
-disp(cov(snp_glance, btc_glance));
+% disp(var(snp_glance, btc_glance));
+% disp(cov(snp_glance, btc_glance));
 %disp(cov(y10, snp_glance));
 
+disp(find_correlation(snp_glance, btc_glance, look_from, look_to));
 
 %https://blockchain.info/charts/market-price?timespan=180days
 %https://www.nasdaq.com/symbol/spy/historical
+%https://fred.stlouisfed.org/series/DGS10
 %https://www.mathworks.com/help/matlab/matlab_prog/set-up-git-source-control.html
 
