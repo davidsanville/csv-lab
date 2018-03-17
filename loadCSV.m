@@ -4,31 +4,30 @@ clear all;
 close all;
 
 %Read in S&P pricing
-    %high correlations (75, 100)=0.123 (45, 85) =0.14 (30,55) -0.106
 look_from = 1; look_to = 125;  %125 weekday, 180 days with weekends
 SNP=csvread('SnPClose.csv' ,2,1);
 snp = flip(SNP(:, 1));
 snp_glance = snp(look_from:look_to);
-
 %Read in BTC pricing
 BTC = csvread('bitcoin.csv',0,1);
 btc = BTC(:, 1);  
 btc_glance = btc(look_from:look_to);
-
 %Read 10yr Yield
 Y10 = load_yields();
 y10 = Y10(1:125);
 
-%covariance & variance tests
-%v = var(y10,snp_glance); disp(v);
-% disp(var(snp_glance, btc_glance));
-% disp(cov(snp_glance, btc_glance));
-%disp(cov(y10, snp_glance));
+list_correlation(snp_glance, btc_glance,10);
 
-disp(find_correlation(snp_glance, btc_glance, look_from, look_to));
+%look at even intervals instead
+% num_intervals = 10;
+% interval_dist = (look_to - look_from) / num_intervals;
+% disp(find_correlation(snp_glance, btc_glance, 10, 20));
+% for j=1:num_intervals
+%     start_indx = j*num_intervals;
+%     stop_indx = start_indx + interval_dist;
+%    
+%     %append to a tablea and sort
+% end
+%disp(find_correlation(snp_glance, btc_glance, look_from, look_to));
 
-%https://blockchain.info/charts/market-price?timespan=180days
-%https://www.nasdaq.com/symbol/spy/historical
-%https://fred.stlouisfed.org/series/DGS10
-%https://www.mathworks.com/help/matlab/matlab_prog/set-up-git-source-control.html
 
