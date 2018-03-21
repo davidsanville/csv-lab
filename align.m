@@ -17,28 +17,23 @@ fclose = (file2);
 %     disp(Data2{1}(:,2)); %BTC prices
    
 
-%filtering
-    
-    
-dates_of_weekdays = [];
-btc_weekday_indexes = [];
+%---------%
+%FILTERING%
+%---------%
 
-for c=1:size(Data2{1,1}, 1) %filter out weekends,
-    %skip saturday
-    if(mod(c+1,7) == 1) 
-        continue
-    end
-    %skip sunday
-    if(mod(c,7) == 1) 
-        continue
-    end
+dates_of_weekdays = []; btc_weekday_indexes = [];
+
+for c=1:size(Data2{1,1}, 1) 
+    %filter out weekends,
+    Sat = c+1; Sun = c; 
+    if(mod(Sat,7) == 1); continue; end
+    if(mod(Sun,7) == 1); continue; end
     
     %%removes seconds from time string,
     str = (strtok(Data2{1,1}(c,1))); 
     Data2{1}(c,1) = str;
     dates_of_weekdays = [dates_of_weekdays; str]; 
     btc_weekday_indexes = [btc_weekday_indexes; c];
-    %disp(Data2{1,1}(c,1));
 end
 
 %for debugging
@@ -47,39 +42,36 @@ end
 %       disp(btc_weekday_indexes); disp(size(btc_weekday_indexes));
       
 
-%get values at weekday indexes, for c in btc weekday indexes
+%get values at each weekday index
 filtered_btc = [];
-for c=1:127 %janky at the side, unit test and update
+fixMe = size(btc_weekday_indexes,1) - 2; 
+%filtered_btc = %%please initialize me
+%disp(size(btc_weekday_indexes,1));
+for c=1:fixMe %janky at the side, unit test and update
     pr = Data2{1}(btc_weekday_indexes(c),2);
     filtered_btc = [filtered_btc ; pr];
-end
+end %end get values at index
 
-% %for debugging data plots
-%     %disp(filtered_btc); disp(size(filtered_btc));
-% plot(str2double(filtered_btc), 'g');
-%     %hold on
-% figure
-% plot(str2double(flip(Data1{1}(:,2))));
-% 
-% %for debugging sizing
-% disp(size(str2double(filtered_btc)));
-% % disp(size(str2double(flip(Data1{1}(:,2)))));
-    %disp(str2double(flip(Data1{1}(:,2))));
-%corrs_ = list_correlation(str2double(filtered_btc), str2double(flip(Data1{1}(:,2))),4);
-%disp(cov(str2double(filtered_btc),str2double(flip(Data1{1}(:,2)))));
+%END FILTERING BTC
 
 
-%filter snp
+%BEGIN FILTERING S&P
 filtered_snp = [];
 flipped = str2double(flip(Data1{1}(:,2))); %flip and typechange
 flipped(127) = 0; %?delete first row with "close" label?
 %disp(flipped);
+%END FILTERING S&P
 
+
+
+
+%---------------%
+%   STATISTICS  %
+%---------------%
 
 %covariance for correlation
 BTC = str2double(filtered_btc);
 disp(cov(BTC, flipped));
-
 
 %intervaled covariance
 disp(cov(BTC(1:10),flipped(1:10)));
@@ -94,11 +86,26 @@ disp(Correlation);
 
 
 
-
+%--------------------------------------------------%
+%--------------------------------------------------%
+%--------------------------------------------------%
 %RUSTY TOOLS aka FOOBAR CODE
 %
 %
 
+% %for debugging data plots (was after btc value @ index loop)
+%     %disp(filtered_btc); disp(size(filtered_btc));
+% plot(str2double(filtered_btc), 'g');
+%     %hold on
+% figure
+% plot(str2double(flip(Data1{1}(:,2))));
+% 
+% %for debugging sizing
+% disp(size(str2double(filtered_btc)));
+% % disp(size(str2double(flip(Data1{1}(:,2)))));
+    %disp(str2double(flip(Data1{1}(:,2))));
+%corrs_ = list_correlation(str2double(filtered_btc), str2double(flip(Data1{1}(:,2))),4);
+%disp(cov(str2double(filtered_btc),str2double(flip(Data1{1}(:,2)))));
 
 %disp(cov(str2double(filtered_btc),str2double(flip(filtered_snp))));
 %disp(str2double(flip(filtered_snp)));
