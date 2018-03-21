@@ -54,21 +54,31 @@ end %end get values at index
 
 
 %BEGIN FILTERING S&P
+janky = 127;
 %first_row_to_clear = size(snp_price,1); %sub 127
 snp_price = str2double(flip(Data1{1}(:,2))); %typechange
-snp_price(127) = 0; %?delete first row with "close" label?
+snp_price(janky) = 0; %?delete first row with "close" label?
 SNP = snp_price;
 BTC = str2double(filtered_btc);
 %END FILTERING S&P
 
+
 %FILTER TREASURY
 ten_year = str2double(Data3{1}(:,2));
-% plot(ten_year);
-% figure
+% %Filter our '.' in treasure (even if hardcoded tenyear(17) = 0;
+ten_year(1) = 0;
+ten_year(17) = 0;
+ten_year(50) = 0;
+ten_year(72) = 0;
+ten_year(77) = 0;
+ten_year(87) = 0;
+ten_year(112) = 0;
+Y10 = ten_year(1:janky);
+%disp(ten_year)
 
-    %Filter our '.' in treasure (even if hardcoded tenyear(17) = 0;
-    %Make intervaled correlation function 
-    %to repeat below, round robin %(btc, snp, 10y)
+
+   
+   
 
 %---------------%
 %   STATISTICS  %
@@ -76,32 +86,27 @@ ten_year = str2double(Data3{1}(:,2));
 
 %covariance 
 
-%disp(cov(BTC, flipped));
-% disp(cov(BTC(30:90),flipped(30:90)));
+%correlation of whole data range
+denominator = std(BTC) * std(SNP);
+Corr = cov(BTC, SNP) / denominator;
+disp("Overall BTC versus SNP"); disp(Corr);
 
-%correlations
-    denominator = std(BTC) * std(SNP);
-Correlation = cov(BTC, flipped) / denominator;
-disp("Overall"); disp(Correlation);
+denominator = std(SNP) * std(Y10); Corr = cov(SNP, Y10) / denominator;
+disp("Overall SNP versus 10Y"); disp(Corr);
 
-%intervalled correlation
-num_intervals = 5;
-spacing = floor(size(BTC,1) / num_intervals);  %spacing = 25;
-sz1 = size(BTC,1); sz2 = size(SNP,1);
-assert(sz1 == sz2);
+denominator = std(Y10) * std(BTC);
+Corr = cov(Y10, BTC) / denominator;
+disp("Overall Y10 versus BTC"); disp(Corr);
 
-Corr_ = zeros(num_intervals);
-for c =1:num_intervals
-    s = 1 + (c-1)*spacing; 
-    f= s+ spacing;
+%interval correlations
+BTCvSNP = correlation_intervals(BTC, SNP, 5);
+SNPvTEN = correlation_intervals(SNP, Y10, 5);
+TENvBTC = correlation_intervals(Y10, BTC, 5);
 
-    denominator = std(BTC(s:f)) * std(SNP(s:f));
-    corr = cov(BTC(s:f), SNP(s:f)) / denominator;
-    Corr_(c) = corr(1,2);
-    disp("interval " +c+ ": " +s + " to " + f); disp(corr);
-end 
-
-plot(Corr_);
+%plot correlations over time
+plot(BTCvSNP, 'g');
+hold on, plot(SNPvTEN ,'r');
+hold on, plot(TENvBTC ,'b');
 
 
 
@@ -213,3 +218,23 @@ plot(Corr_);
 %     Data2{1,1}(c,1) = str;
 %     %disp(Data2{1,1}(c,1));
 % end
+
+%in function now
+% %intervalled correlation
+% num_intervals = 5;
+% spacing = floor(size(BTC,1) / num_intervals);  %spacing = 25;
+% sz1 = size(BTC,1); sz2 = size(SNP,1);
+% assert(sz1 == sz2);
+% 
+% Corr_ = zeros(num_intervals);
+% for c =1:num_intervals
+%     s = 1 + (c-1)*spacing; 
+%     f= s+ spacing;
+% 
+%     denominator = std(BTC(s:f)) * std(SNP(s:f));
+%     corr = cov(BTC(s:f), SNP(s:f)) / denominator;
+%     Corr_(c) = corr(1,2);
+%     disp("interval " +c+ ": " +s + " to " + f); disp(corr);
+% end 
+% 
+% plot(Corr_);
