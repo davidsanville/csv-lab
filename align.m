@@ -1,3 +1,6 @@
+%This script aligns two CSV files by date
+    %the smarter way is to break matching into weekly containers?
+
 %read CSV files
 file1 = fopen('SnPClose.csv','r');
 Data1 = textscan(file1, '%s%s%d', 'Delimiter',',', 'CollectOutput',1);
@@ -12,50 +15,93 @@ fclose = (file2);
 %     disp(Data1{1}(:,2)); %S&P prices
 %     disp(Data2{1}(:,1)); %BTC dates
 %     disp(Data2{1}(:,2)); %BTC prices
-        
+   
 
-%removes seconds from time string, for alignment
-% for c=1:size(Data2{1,1}, 1)
-%     str = (strtok(Data2{1,1}(c,1)));
-%     Data2{1,1}(c,1) = str;
-%     %disp(Data2{1,1}(c,1));
-% end
-
-%filter btc for weekdays
+%filtering
+    
+    
 dates_of_weekdays = [];
 btc_weekday_indexes = [];
-for c=1:size(Data2{1,1}, 1)
-    if(mod(c+1,7) == 1) %skip saturday
+
+for c=1:size(Data2{1,1}, 1) %filter out weekends,
+    %skip saturday
+    if(mod(c+1,7) == 1) 
         continue
     end
-    if(mod(c,7) == 1) %skip sunday
+    %skip sunday
+    if(mod(c,7) == 1) 
         continue
     end
-    str = (strtok(Data2{1,1}(c,1))); %elimate seconds parameters
+    
+    %%removes seconds from time string,
+    str = (strtok(Data2{1,1}(c,1))); 
     Data2{1}(c,1) = str;
-    dates_of_weekdays = [dates_of_weekdays; str]; %append
+    dates_of_weekdays = [dates_of_weekdays; str]; 
     btc_weekday_indexes = [btc_weekday_indexes; c];
     %disp(Data2{1,1}(c,1));
 end
 
+%for debugging
 %      disp(Data2{1}(:,1)); %BTC dates
-      disp(dates_of_weekdays); disp(size(dates_of_weekdays));
-      disp(btc_weekday_indexes); disp(size(btc_weekday_indexes));
+%       disp(dates_of_weekdays); disp(size(dates_of_weekdays));
+%       disp(btc_weekday_indexes); disp(size(btc_weekday_indexes));
       
+
+%get values at weekday indexes, for c in btc weekday indexes
 filtered_btc = [];
-%for c in btc_weekday_indexes
-for c=1:129
+for c=1:127 %janky at the side, unit test and update
     pr = Data2{1}(btc_weekday_indexes(c),2);
     filtered_btc = [filtered_btc ; pr];
 end
-    %disp(filtered_btc); disp(size(filtered_btc));
-    plot(str2double(filtered_btc), 'g');
-    %hold on
-    figure
-    plot(str2double(flip(Data1{1}(:,2))));
+
+% %for debugging data plots
+%     %disp(filtered_btc); disp(size(filtered_btc));
+% plot(str2double(filtered_btc), 'g');
+%     %hold on
+% figure
+% plot(str2double(flip(Data1{1}(:,2))));
+% 
+% %for debugging sizing
+% disp(size(str2double(filtered_btc)));
+% % disp(size(str2double(flip(Data1{1}(:,2)))));
+    %disp(str2double(flip(Data1{1}(:,2))));
+%corrs_ = list_correlation(str2double(filtered_btc), str2double(flip(Data1{1}(:,2))),4);
+%disp(cov(str2double(filtered_btc),str2double(flip(Data1{1}(:,2)))));
+
+
+%filter snp
+filtered_snp = [];
+flipped = str2double(flip(Data1{1}(:,2))); %flip and typechange
+flipped(127) = 0; %?delete first row with "close" label?
+%disp(flipped);
+
+
+%covariance for correlation
+BTC = str2double(filtered_btc);
+disp(cov(BTC, flipped));
+
+
+%intervaled covariance
+disp(cov(BTC(1:10),flipped(1:10)));
+disp(cov(BTC(1:127),flipped(1:127)));
+disp(cov(BTC(30:90),flipped(30:90)));
+
+%correlations
+    denominator = std(BTC) * std(flipped);
+Correlation = cov(BTC, flipped) / denominator;
+disp(Correlation);
 
 
 
+
+
+%RUSTY TOOLS aka FOOBAR CODE
+%
+%
+
+
+%disp(cov(str2double(filtered_btc),str2double(flip(filtered_snp))));
+%disp(str2double(flip(filtered_snp)));
 
 % %align S&P and weekend
 % Weekdays = []; %date strings of weekends
@@ -123,3 +169,11 @@ end
 
 %foo = find('2018/03/14');
 %indx = index_of(foo);
+
+
+%removes seconds from time string, for alignment
+% for c=1:size(Data2{1,1}, 1)
+%     str = (strtok(Data2{1,1}(c,1)));
+%     Data2{1,1}(c,1) = str;
+%     %disp(Data2{1,1}(c,1));
+% end
