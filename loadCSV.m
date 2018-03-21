@@ -1,5 +1,4 @@
-%align dates across csv files
-    %weekday_filter is broke
+
 clear all;
 close all;
 
@@ -14,20 +13,38 @@ btc = BTC(:, 1);
 btc_glance = btc(look_from:look_to);
 %Read 10yr Yield
 Y10 = load_yields();
-y10 = Y10(1:125);
+y10_glance = Y10(look_from:look_to);
 
-list_correlation(snp_glance, btc_glance,10);
+%align dates across csv files
+    %see weekday_filer
+    %see align
 
-%look at even intervals instead
-% num_intervals = 10;
-% interval_dist = (look_to - look_from) / num_intervals;
-% disp(find_correlation(snp_glance, btc_glance, 10, 20));
-% for j=1:num_intervals
-%     start_indx = j*num_intervals;
-%     stop_indx = start_indx + interval_dist;
-%    
-%     %append to a tablea and sort
-% end
-%disp(find_correlation(snp_glance, btc_glance, look_from, look_to));
+plot(snp_glance);
+%hold on
+figure
+plot(btc_glance);
+%hold on 
+figure
+plot(y10_glance);
+
+figure; 
+
+%not robust for all intervals, unit test
+foo = list_correlation(snp_glance, btc_glance,5);
+for j =1:5
+    corrs_(j) = foo(2*j);
+end
+
+plot(corrs_);
+
+% figure;
+% plot(list_variation(snp_glance, btc_glance, 5));
+% figure;
+% plot(list_variation(btc_glance, btc_glance, 5));
+
+%correlation12 = cov12 / (stdev1 * stdev2)
+%variance1 = v1;
+%pca, etc
+
 
 

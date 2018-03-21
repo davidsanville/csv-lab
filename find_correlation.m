@@ -4,5 +4,6 @@ function corr = find_correlation(x, y, min, max)
     y1 = y(min:max);
     %cov(x1,y1);
   
-    corr = cov(x1,y1);
+    covariance = cov(x1,y1);
+    corr = covariance / (std(x) * std(y));
 end
