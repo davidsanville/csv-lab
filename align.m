@@ -1,5 +1,7 @@
 %This script aligns two CSV files by date
     %the smarter way is to break matching into weekly containers?
+close all
+clear all
 
 %read CSV files
 file1 = fopen('SnPClose.csv','r');
@@ -98,15 +100,29 @@ denominator = std(Y10) * std(BTC);
 Corr = cov(Y10, BTC) / denominator;
 disp("Overall Y10 versus BTC"); disp(Corr);
 
-%interval correlations
-BTCvSNP = correlation_intervals(BTC, SNP, 5);
-SNPvTEN = correlation_intervals(SNP, Y10, 5);
-TENvBTC = correlation_intervals(Y10, BTC, 5);
+%interval correlation
+BTCvSNP = correlation_intervals(BTC, SNP, 21);
+SNPvTEN = correlation_intervals(SNP, Y10, 21);
+TENvBTC = correlation_intervals(Y10, BTC, 21);
 
 %plot correlations over time
+figure
 plot(BTCvSNP, 'g');
+title("Correlation: S&P and BTC");
+xlabel("6 months, 127 weekdays: 21 intervals of ~6 weekday market sessions");
+ylabel("Correlation Coefficient");
+
+figure
+plot(BTCvSNP(:,1), 'g');
+title("S&P vs. BTC (green);  S&P vs. 10Y (red)");
+xlabel("180 days: 21 intervals of ~6 weekday market sessions");
+ylabel("Correlation Coefficient");
+
 hold on, plot(SNPvTEN ,'r');
-hold on, plot(TENvBTC ,'b');
+%hold on, plot(TENvBTC ,'b');
+%  figure 
+%  plot(SNPvTEN ,'r');
+ 
 
 
 

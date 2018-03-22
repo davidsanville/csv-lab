@@ -1,5 +1,7 @@
 %This script aligns two CSV files by date
     %the smarter way is to break matching into weekly containers?
+close all
+clear all
 
 %read CSV files
 file1 = fopen('SnPClose.csv','r');
@@ -88,26 +90,47 @@ Y10 = ten_year(1:janky);
 
 %correlation of whole data range
 denominator = std(BTC) * std(SNP);
-Correlation = cov(BTC, SNP) / denominator;
-disp("Overall BTC versus SNP"); disp(Correlation);
+Corr = cov(BTC, SNP) / denominator;
+disp("Overall BTC versus SNP"); disp(Corr);
 
-denominator = std(SNP) * std(Y10);
-Correlation = cov(SNP, Y10) / denominator;
-disp("Overall SNP versus 10Y"); disp(Correlation);
+denominator = std(SNP) * std(Y10); Corr = cov(SNP, Y10) / denominator;
+disp("Overall SNP versus 10Y"); disp(Corr);
 
-denominator = std(Y10) * std(Y10);
-Correlation = cov(SNP, Y10) / denominator;
-disp("Overall SNP versus 10Y"); disp(Correlation);
+denominator = std(Y10) * std(BTC);
+Corr = cov(Y10, BTC) / denominator;
+disp("Overall Y10 versus BTC"); disp(Corr);
 
 %interval correlations
-BTCvSNP = correlation_intervals(BTC, SNP, 5);
-SNPvTEN = correlation_intervals(SNP, Y10, 5);
-TENvBTC = correlation_intervals(Y10, BTC, 5);
+BTCvSNP = correlation_intervals(BTC, SNP, 18);
+SNPvTEN = correlation_intervals(SNP, Y10, 18);
+TENvBTC = correlation_intervals(Y10, BTC, 18);
 
 %plot correlations over time
+
+figure
+plot(log(BTC) , 'g');
+hold on; plot(log(SNP), 'b' );
+hold on; plot(lY10 ,'r');
+
+figure
 plot(BTCvSNP, 'g');
+title("Correlation: S&P and BTC");
+xlabel("180 days: 18 intervals of 10 weekday market sessions");
+ylabel("Correlation Coefficient");
+
+figure
+plot(BTCvSNP(:,1), 'g');
+title("S&P vs. BTC (green);  S&P vs. 10Y (red)");
+xlabel("180 days: 18 intervals of 10 weekday market sessions");
+ylabel("Correlation Coefficient");
+
 hold on, plot(SNPvTEN ,'r');
-hold on, plot(TENvBTC ,'b');
+%hold on, plot(TENvBTC ,'b');
+%  figure 
+%  plot(SNPvTEN ,'r');
+ 
+
+
 
 
 
